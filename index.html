@@ -368,230 +368,249 @@
             return (
                 <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
                     <div className="max-w-7xl mx-auto">
-                        {/* Header */}
-                        <div className="flex justify-between items-center mb-8">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-red-500 rounded-full p-2">
-                                    <Youtube className="w-6 h-6 text-white" />
-                                </div>
-                                <h1 className="text-2xl font-bold text-white">Live Subscriber Count</h1>
-                            </div>
-                            <button
-                                onClick={handleReset}
-                                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors duration-200"
-                            >
-                                <Settings className="w-4 h-4" />
-                                Settings
-                            </button>
-                        </div>
-
                         {error && (
                             <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 mb-6 text-red-400">
                                 {error}
                             </div>
                         )}
 
-                        {/* Shareable Link Card */}
-                        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-6 mb-6">
-                            <div className="flex items-start gap-4">
-                                <div className="bg-blue-500/20 rounded-lg p-3">
-                                    <Link2 className="w-6 h-6 text-blue-400" />
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className="text-lg font-semibold text-white mb-2">Share This Monitor</h3>
-                                    <p className="text-slate-400 text-sm mb-3">
-                                        Anyone with this link can view the live subscriber count without entering credentials
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={window.location.href}
-                                            readOnly
-                                            className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-slate-300 text-sm"
-                                        />
+                        {/* Channel Info and Subscriber Count - Top Section */}
+                        <div className="bg-slate-800 rounded-3xl shadow-2xl border border-slate-700 p-8 mb-6">
+                            {channelInfo && (
+                                <div className="flex flex-col items-center text-center mb-8">
+                                    <img 
+                                        src={channelInfo.thumbnail} 
+                                        alt={channelInfo.title}
+                                        className="w-32 h-32 rounded-full border-4 border-red-500 mb-4"
+                                    />
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <h2 className="text-3xl font-bold text-white">{channelInfo.title}</h2>
+                                        <CheckCircle className="w-7 h-7 text-slate-400" />
+                                    </div>
+                                    {channelInfo.customUrl && (
+                                        <p className="text-slate-400 text-base mb-3">@{channelInfo.customUrl}</p>
+                                    )}
+                                    <div className="flex items-center gap-3">
+                                        <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${isLoading ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}`}>
+                                            <div className={`w-2.5 h-2.5 rounded-full ${isLoading ? 'bg-yellow-400 animate-pulse-slow' : 'bg-green-400'}`} />
+                                            <span className="text-sm font-medium">{isLoading ? 'Updating' : 'Live'}</span>
+                                        </div>
+                                        {lastUpdate && (
+                                            <span className="text-sm text-slate-500">
+                                                Last update: {lastUpdate.toLocaleTimeString()}
+                                            </span>
+                                        )}
                                         <button
-                                            onClick={copyToClipboard}
-                                            className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200"
+                                            onClick={fetchChannelData}
+                                            disabled={isLoading}
+                                            className="p-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-700/50 rounded-lg transition-colors duration-200"
                                         >
-                                            {copied ? (
-                                                <>
-                                                    <Check className="w-4 h-4" />
-                                                    Copied!
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Copy className="w-4 h-4" />
-                                                    Copy
-                                                </>
-                                            )}
+                                            <RefreshCw className={`w-5 h-5 text-white ${isLoading ? 'animate-spin' : ''}`} />
                                         </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Subscriber Count Display */}
+                            <div className="text-center py-8 border-t border-slate-700">
+                                <div className="flex items-center justify-center gap-3 mb-4">
+                                    <div className="bg-red-500/20 rounded-lg p-2">
+                                        <Users className="w-6 h-6 text-red-400" />
+                                    </div>
+                                    <h3 className="text-slate-400 text-base font-medium">SUBSCRIBERS</h3>
+                                </div>
+                                
+                                <div className="count-animation">
+                                    <div className="text-8xl font-bold text-white mb-4">
+                                        {formatNumber(subscriberCount)}
+                                    </div>
+                                    <div className="flex items-center justify-center">
+                                        {getChangeIndicator()}
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-slate-700 grid grid-cols-2 gap-8 max-w-md mx-auto">
+                                    <div>
+                                        <p className="text-slate-500 text-xs mb-2">TOTAL VIEWS</p>
+                                        <p className="text-3xl font-bold text-white">{formatCompactNumber(statistics?.viewCount)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-slate-500 text-xs mb-2">TOTAL VIDEOS</p>
+                                        <p className="text-3xl font-bold text-white">{formatNumber(statistics?.videoCount)}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Channel Info Card */}
-                        {channelInfo && (
-                            <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6 mb-6">
-                                <div className="flex items-center gap-4">
-                                    <img 
-                                        src={channelInfo.thumbnail} 
-                                        alt={channelInfo.title}
-                                        className="w-20 h-20 rounded-full border-4 border-red-500"
-                                    />
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
-                                            <h2 className="text-2xl font-bold text-white">{channelInfo.title}</h2>
-                                            <CheckCircle className="w-6 h-6 text-slate-400" />
-                                        </div>
-                                        {channelInfo.customUrl && (
-                                            <p className="text-slate-400 text-sm mt-1">@{channelInfo.customUrl}</p>
-                                        )}
-                                        <div className="flex items-center gap-2 mt-2">
-                                            <div className={`flex items-center gap-1 px-3 py-1 rounded-full ${isLoading ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}`}>
-                                                <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-400 animate-pulse-slow' : 'bg-green-400'}`} />
-                                                <span className="text-xs font-medium">{isLoading ? 'Updating' : 'Live'}</span>
+                        {/* Bottom Section - Settings and Share Link */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            
+                            {/* Settings Panel */}
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <Settings className="w-6 h-6 text-red-400" />
+                                        <h2 className="text-xl font-bold text-white">Settings</h2>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Auto Refresh */}
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <RefreshCw className="w-5 h-5 text-red-400" />
+                                                <h3 className="text-base font-semibold text-white">Auto Refresh</h3>
                                             </div>
-                                            {lastUpdate && (
-                                                <span className="text-xs text-slate-500">
-                                                    Last update: {lastUpdate.toLocaleTimeString()}
-                                                </span>
+                                            
+                                            <div className="flex items-center justify-between mb-4">
+                                                <span className="text-slate-400 text-sm">Enable</span>
+                                                <button
+                                                    onClick={() => setAutoRefresh(!autoRefresh)}
+                                                    className={`relative w-14 h-7 rounded-full transition-colors duration-200 ${
+                                                        autoRefresh ? 'bg-red-500' : 'bg-slate-600'
+                                                    }`}
+                                                >
+                                                    <div
+                                                        className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-200 ${
+                                                            autoRefresh ? 'translate-x-7' : ''
+                                                        }`}
+                                                    />
+                                                </button>
+                                            </div>
+
+                                            {autoRefresh && (
+                                                <div>
+                                                    <label className="block text-sm text-slate-400 mb-2">
+                                                        Interval: {refreshInterval}s
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={refreshInterval}
+                                                        onChange={(e) => setRefreshInterval(parseInt(e.target.value))}
+                                                        min="10"
+                                                        max="120"
+                                                        step="10"
+                                                        className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                                                    />
+                                                    <div className="flex justify-between text-xs text-slate-500 mt-1">
+                                                        <span>10s</span>
+                                                        <span>120s</span>
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
-                                    </div>
-                                    <button
-                                        onClick={fetchChannelData}
-                                        disabled={isLoading}
-                                        className="p-3 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-700/50 rounded-lg transition-colors duration-200"
-                                    >
-                                        <RefreshCw className={`w-5 h-5 text-white ${isLoading ? 'animate-spin' : ''}`} />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
 
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                            {/* Main Subscriber Count */}
-                            <div className="lg:col-span-2">
-                                <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-8">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="bg-red-500/20 rounded-lg p-3">
-                                            <Users className="w-6 h-6 text-red-400" />
-                                        </div>
+                                        {/* Channel Status */}
                                         <div>
-                                            <h3 className="text-slate-400 text-sm font-medium">SUBSCRIBERS</h3>
-                                            <p className="text-slate-500 text-xs">Real-time count</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="flex items-end justify-between">
-                                        <div className="count-animation">
-                                            <div className="text-7xl font-bold text-white mb-2">
-                                                {formatNumber(subscriberCount)}
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <Video className="w-5 h-5 text-red-400" />
+                                                <h3 className="text-base font-semibold text-white">Channel Status</h3>
                                             </div>
-                                            {getChangeIndicator()}
-                                        </div>
-                                        {isLoading && (
-                                            <div className="mb-4">
-                                                <Activity className="w-12 h-12 text-red-500 animate-pulse" />
+                                            
+                                            <div className="space-y-3">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-slate-400 text-sm">Visibility</span>
+                                                    <span className="text-green-400 text-sm font-medium">Public</span>
+                                                </div>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-slate-400 text-sm">Sub Count</span>
+                                                    <span className={`text-sm font-medium ${statistics?.hiddenSubscriberCount ? 'text-amber-400' : 'text-green-400'}`}>
+                                                        {statistics?.hiddenSubscriberCount ? 'Hidden' : 'Visible'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-slate-400 text-sm">API Status</span>
+                                                    <span className="text-green-400 text-sm font-medium">Active</span>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-
-                                    <div className="mt-8 pt-6 border-t border-slate-700 grid grid-cols-2 gap-4">
-                                        <div>
-                                            <p className="text-slate-500 text-xs mb-1">TOTAL VIEWS</p>
-                                            <p className="text-2xl font-bold text-white">{formatCompactNumber(statistics?.viewCount)}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-slate-500 text-xs mb-1">TOTAL VIDEOS</p>
-                                            <p className="text-2xl font-bold text-white">{formatNumber(statistics?.videoCount)}</p>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            {/* Sidebar */}
-                            <div className="space-y-6">
-                                {/* Auto Refresh Settings */}
-                                <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <RefreshCw className="w-5 h-5 text-red-400" />
-                                        <h3 className="text-lg font-semibold text-white">Auto Refresh</h3>
-                                    </div>
-                                    
-                                    <div className="flex items-center justify-between mb-4">
-                                        <span className="text-slate-400 text-sm">Enable</span>
+                                    <div className="mt-6 pt-6 border-t border-slate-700">
                                         <button
-                                            onClick={() => setAutoRefresh(!autoRefresh)}
-                                            className={`relative w-14 h-7 rounded-full transition-colors duration-200 ${
-                                                autoRefresh ? 'bg-red-500' : 'bg-slate-600'
-                                            }`}
+                                            onClick={handleReset}
+                                            className="flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors duration-200"
                                         >
-                                            <div
-                                                className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-200 ${
-                                                    autoRefresh ? 'translate-x-7' : ''
-                                                }`}
-                                            />
+                                            <Settings className="w-5 h-5" />
+                                            Reset Configuration
                                         </button>
                                     </div>
+                                </div>
 
-                                    {autoRefresh && (
-                                        <div>
-                                            <label className="block text-sm text-slate-400 mb-2">
-                                                Interval: {refreshInterval}s
-                                            </label>
-                                            <input
-                                                type="range"
-                                                value={refreshInterval}
-                                                onChange={(e) => setRefreshInterval(parseInt(e.target.value))}
-                                                min="10"
-                                                max="120"
-                                                step="10"
-                                                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <div className="flex justify-between text-xs text-slate-500 mt-1">
-                                                <span>10s</span>
-                                                <span>120s</span>
+                                {/* Shareable Link */}
+                                <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="bg-blue-500/20 rounded-lg p-3">
+                                            <Link2 className="w-6 h-6 text-blue-400" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-semibold text-white mb-2">Share This Monitor</h3>
+                                            <p className="text-slate-400 text-sm mb-4">
+                                                Anyone with this link can view the live subscriber count without entering credentials
+                                            </p>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={window.location.href}
+                                                    readOnly
+                                                    className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-slate-300 text-sm"
+                                                />
+                                                <button
+                                                    onClick={copyToClipboard}
+                                                    className="flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 whitespace-nowrap"
+                                                >
+                                                    {copied ? (
+                                                        <>
+                                                            <Check className="w-5 h-5" />
+                                                            Copied!
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Copy className="w-5 h-5" />
+                                                            Copy Link
+                                                        </>
+                                                    )}
+                                                </button>
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
+                            </div>
 
-                                {/* Channel Status */}
+                            {/* Sidebar - Live Subscriber Count Title and Status */}
+                            <div className="space-y-6">
                                 <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 p-6">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <Video className="w-5 h-5 text-red-400" />
-                                        <h3 className="text-lg font-semibold text-white">Channel Status</h3>
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="bg-red-500 rounded-full p-2">
+                                            <Youtube className="w-6 h-6 text-white" />
+                                        </div>
+                                        <h2 className="text-xl font-bold text-white">Live Subscriber Count</h2>
                                     </div>
-                                    
-                                    <div className="space-y-3">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-slate-400 text-sm">Visibility</span>
-                                            <span className="text-green-400 text-sm font-medium">Public</span>
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-slate-400 text-sm">Sub Count</span>
-                                            <span className={`text-sm font-medium ${statistics?.hiddenSubscriberCount ? 'text-amber-400' : 'text-green-400'}`}>
-                                                {statistics?.hiddenSubscriberCount ? 'Hidden' : 'Visible'}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-slate-400 text-sm">API Status</span>
-                                            <span className="text-green-400 text-sm font-medium">Active</span>
-                                        </div>
-                                    </div>
+                                    <p className="text-slate-400 text-sm">
+                                        Real-time monitoring of your YouTube channel's subscriber count with automatic updates.
+                                    </p>
                                 </div>
 
-                                {/* Quick Stats */}
+                                {/* Monitoring Status */}
                                 <div className="bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-2xl border border-red-500/20 p-6">
                                     <div className="flex items-center gap-2 mb-3">
                                         <Activity className="w-5 h-5 text-red-400" />
                                         <h3 className="text-sm font-semibold text-red-400">MONITORING ACTIVE</h3>
                                     </div>
-                                    <p className="text-slate-400 text-xs">
+                                    <p className="text-slate-400 text-xs mb-4">
                                         Tracking subscriber changes every {refreshInterval} seconds
                                     </p>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between text-xs">
+                                            <span className="text-slate-500">Refresh Rate</span>
+                                            <span className="text-white font-medium">{refreshInterval}s</span>
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs">
+                                            <span className="text-slate-500">Auto Refresh</span>
+                                            <span className={`font-medium ${autoRefresh ? 'text-green-400' : 'text-slate-400'}`}>
+                                                {autoRefresh ? 'On' : 'Off'}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
